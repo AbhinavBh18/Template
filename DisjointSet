@@ -1,6 +1,7 @@
 class DSU{
-        vector<int> size, parent, rank;
+        
 public:
+        vector<int> size, parent, rank;
         DSU(int n) {
                 rank.resize(n+1);
                 parent.resize(n+1);
