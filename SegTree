@@ -1,0 +1,41 @@
+int t[4*maxn];
+void build(vi& a, int v, int start, int end) {
+        if (start == end) {
+                t[v] = a[start];
+        } else {
+                int tm = (start + end) / 2;
+                build(a, v*2, start, tm);
+                build(a, v*2+1, tm+1, end);
+                t[v] = min(t[v*2],t[v*2+1]);
+        }
+}
+int sum(int v, int start, int end, int l, int r) {
+        if (l > r) 
+                return 0;
+        if (l == start && r == end) {
+                return t[v];
+        }
+        int tm = (start + end) / 2;
+        return sum(v*2, start, tm, l, min(r, tm)) + sum(v*2+1, tm+1, end, max(l, tm+1), r);
+}
+void update(int v, int start, int end, int pos, int new_val) {
+        if (start == end) {
+                t[v] = new_val;
+        } else {
+                int tm = (start + end) / 2;
+
+                if (pos <= tm) update(v*2, start, tm, pos, new_val);
+
+                else update(v*2+1, tm+1, end, pos, new_val);
+
+                t[v] = min(t[v*2],t[v*2+1]);
+        }
+}
+int mini(int v,int start, int end, int l, int r){
+        if(l>r) return INF;
+        if(l==start && r==end){
+                return t[v];
+        }
+        int mid = (start+end)/2;
+        return min(mini((v*2),start,mid,l,min(r,mid)), mini((2*v)+1, mid+1, end, max(l,mid+1), r));
+}
