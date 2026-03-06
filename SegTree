@@ -1,41 +1,44 @@
-int t[4*maxn];
-void build(vi& a, int v, int start, int end) {
-        if (start == end) {
-                t[v] = a[start];
-        } else {
-                int tm = (start + end) / 2;
-                build(a, v*2, start, tm);
-                build(a, v*2+1, tm+1, end);
-                t[v] = min(t[v*2],t[v*2+1]);
+struct segTree {
+    
+    int size;
+    vector<int> sums;
+    
+    void init(int n) {
+        size = 1;
+        while(size < n) size *= 2;
+        sums.assign(2 * size, 0LL);
+    }
+    
+    void set(int i, int v, int x, int lx, int rx) {
+        if(rx - lx == 1) {
+            sums[x] = v;
+            return;
         }
-}
-int sum(int v, int start, int end, int l, int r) {
-        if (l > r) 
-                return 0;
-        if (l == start && r == end) {
-                return t[v];
+        int m = (lx + rx) / 2;
+        if(i < m) {
+            set(i, v, 2 * x + 1, lx, m);
         }
-        int tm = (start + end) / 2;
-        return sum(v*2, start, tm, l, min(r, tm)) + sum(v*2+1, tm+1, end, max(l, tm+1), r);
-}
-void update(int v, int start, int end, int pos, int new_val) {
-        if (start == end) {
-                t[v] = new_val;
-        } else {
-                int tm = (start + end) / 2;
-
-                if (pos <= tm) update(v*2, start, tm, pos, new_val);
-
-                else update(v*2+1, tm+1, end, pos, new_val);
-
-                t[v] = min(t[v*2],t[v*2+1]);
+        else {
+            set(i, v, 2 * x + 2, m, rx);
         }
-}
-int mini(int v,int start, int end, int l, int r){
-        if(l>r) return INF;
-        if(l==start && r==end){
-                return t[v];
-        }
-        int mid = (start+end)/2;
-        return min(mini((v*2),start,mid,l,min(r,mid)), mini((2*v)+1, mid+1, end, max(l,mid+1), r));
-}
+        sums[x] = sums[2 * x + 1] + sums[2 * x + 2];
+    }
+    
+    void set(int i, int v) {
+        set(i, v, 0, 0, size);
+    }
+    
+    int sum(int l, int r, int x, int lx, int rx) {
+        if(lx >= r || l >= rx) return 0;
+        if(lx >= l && rx <= r) return sums[x];
+        int m = (lx + rx) / 2;
+        int s1 = sum(l, r, 2 * x + 1, lx, m);
+        int s2 = sum(l, r, 2 * x + 2, m, rx);
+        return s1 + s2;
+    }
+    
+    int sum(int l, int r) {
+        return sum(l, r, 0, 0, size);
+    }
+    
+};
